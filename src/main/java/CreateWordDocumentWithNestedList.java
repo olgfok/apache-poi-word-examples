@@ -14,15 +14,18 @@ public class CreateWordDocumentWithNestedList {
         XWPFDocument document = new XWPFDocument();
 
         BigInteger numId = createNumbering(document, 3);
+        addParagraph(numId, document, 0, "");
 
-        addParagraph(numId, document, 0, "First level row 1");
-        addParagraph(numId, document, 1, "Second level row 1.1");
-        addParagraph(numId, document, 2, "Third level row 1.1.1");
-        addParagraph(numId, document, 2, "Third level row 1.1.2");
+        addParagraph(numId, document, 1, "First level row 1A");
+        addParagraph(numId, document, 2, "Second level row 1.1");
+        addParagraph(numId, document, 3, "Third level row 1.1.1");
+        addParagraph(numId, document, 3, "Third level row 1.1.2");
         addParagraph(numId, document, 1, "Second level row 1.2");
 
-        addParagraph(numId, document, 0, "First level row 2");
-        addParagraph(numId, document, 1, "Second level row 2.1");
+        addParagraph(numId, document, 0, "");
+
+        addParagraph(numId, document, 1, "First level row 2B");
+        addParagraph(numId, document, 2, "Second level row 2.1");
 
         FileOutputStream out = new FileOutputStream("CreateWordDocumentWithNestedList.docx");
         document.write(out);
@@ -53,7 +56,11 @@ public class CreateWordDocumentWithNestedList {
         for (int level = 0; level < levelCount; level++) {
             CTLvl ctLvl = ctAbstractNum.addNewLvl();
             ctLvl.setIlvl(BigInteger.valueOf(level));
-            ctLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
+            if (level ==1) {
+                ctLvl.addNewNumFmt().setVal(STNumberFormat.UPPER_LETTER);
+            } else {
+                ctLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
+            }
             ctLvl.addNewLvlText().setVal(getLvlTxtVal(level));
             ctLvl.addNewStart().setVal(BigInteger.ONE);
         }
@@ -63,6 +70,9 @@ public class CreateWordDocumentWithNestedList {
     private static String getLvlTxtVal(Integer level) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i <= level; i++) {
+            if (level ==2 && i==1) {
+                continue;
+            }
             sb.append("%").append(i + 1).append(".");
 
         }
@@ -76,7 +86,7 @@ public class CreateWordDocumentWithNestedList {
         //sets level to paragraph
         CTDecimalNumber ctDecimalNumber = p.getCTP().getPPr().getNumPr().addNewIlvl();
         ctDecimalNumber.setVal(BigInteger.valueOf(level));//sets level value
-        p.setIndentationLeft(level * 360);
+      //  p.setIndentationLeft(level * 360);
         p.createRun().setText(rowName);
     }
 
