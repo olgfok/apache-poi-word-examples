@@ -1,40 +1,19 @@
+package com.olgfok.word.creators;
+
 import org.apache.poi.xwpf.usermodel.XWPFAbstractNum;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFNumbering;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 
-public class CreateWordDocumentWithNestedList {
+/**
+ * Creates numbered lists
+ */
+public class ListCreator {
 
-    public static void main(String[] args) throws IOException {
-        XWPFDocument document = new XWPFDocument();
-
-        BigInteger numId = createNumbering(document, 3);
-        addParagraph(numId, document, 0, "");
-
-        addParagraph(numId, document, 1, "First level row 1A");
-        addParagraph(numId, document, 2, "Second level row 1.1");
-        addParagraph(numId, document, 3, "Third level row 1.1.1");
-        addParagraph(numId, document, 3, "Third level row 1.1.2");
-        addParagraph(numId, document, 1, "Second level row 1.2");
-
-        addParagraph(numId, document, 0, "");
-
-        addParagraph(numId, document, 1, "First level row 2B");
-        addParagraph(numId, document, 2, "Second level row 2.1");
-
-        FileOutputStream out = new FileOutputStream("CreateWordDocumentWithNestedList.docx");
-        document.write(out);
-
-        System.out.println("CreateWordTableWithBulletList written successully");
-
-    }
-
-    private static BigInteger createNumbering(XWPFDocument document,
+    public BigInteger createNumbering(XWPFDocument document,
                                               Integer levelCount) {
         XWPFNumbering numbering = document.createNumbering();
 
@@ -52,43 +31,35 @@ public class CreateWordDocumentWithNestedList {
 
     }
 
-    private static void addCTLevels(CTAbstractNum ctAbstractNum, Integer levelCount) {
+    private void addCTLevels(CTAbstractNum ctAbstractNum, Integer levelCount) {
         for (int level = 0; level < levelCount; level++) {
             CTLvl ctLvl = ctAbstractNum.addNewLvl();
             ctLvl.setIlvl(BigInteger.valueOf(level));
-            if (level ==1) {
-                ctLvl.addNewNumFmt().setVal(STNumberFormat.UPPER_LETTER);
-            } else {
-                ctLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
-            }
+            ctLvl.addNewNumFmt().setVal(STNumberFormat.DECIMAL);
             ctLvl.addNewLvlText().setVal(getLvlTxtVal(level));
             ctLvl.addNewStart().setVal(BigInteger.ONE);
         }
 
     }
 
-    private static String getLvlTxtVal(Integer level) {
+    private String getLvlTxtVal(Integer level) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i <= level; i++) {
-            if (level ==2 && i==1) {
-                continue;
-            }
             sb.append("%").append(i + 1).append(".");
 
         }
         return sb.toString();
     }
 
-    private static void addParagraph(BigInteger numId, XWPFDocument document, Integer level,
+    public void addParagraph(BigInteger numId, XWPFDocument document, Integer level,
                                      String rowName) {
         XWPFParagraph p = document.createParagraph();
         p.setNumID(numId);
         //sets level to paragraph
         CTDecimalNumber ctDecimalNumber = p.getCTP().getPPr().getNumPr().addNewIlvl();
         ctDecimalNumber.setVal(BigInteger.valueOf(level));//sets level value
-      //  p.setIndentationLeft(level * 360);
+        p.setIndentationLeft(level * 360);
         p.createRun().setText(rowName);
     }
-
 
 }
