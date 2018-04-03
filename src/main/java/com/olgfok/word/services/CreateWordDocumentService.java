@@ -1,6 +1,6 @@
 package com.olgfok.word.services;
 
-import com.olgfok.word.dto.DocumentContent;
+import com.olgfok.word.elements.DocumentContent;
 
 import java.io.IOException;
 

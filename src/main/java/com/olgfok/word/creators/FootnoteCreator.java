@@ -1,23 +1,22 @@
 package com.olgfok.word.creators;
 
-import com.olgfok.word.dto.Footnote;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.impl.xb.xmlschema.SpaceAttribute;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigInteger;
-import java.util.List;
 
 public class FootnoteCreator {
     private static final String FOOTNOTE_STYLE_ID = "FootnoteStyle";
 
-    private final XWPFDocument doc;
-    public FootnoteCreator(XWPFDocument doc) {
-        this.doc = doc;
-        initFootnote();
-    }
+    @Autowired
+    private XWPFDocument doc;
 
-    private void initFootnote() {
+
+    @PostConstruct
+    public void initFootnote() {
         addFootnoteReferenceStyle();
 
         if (doc.getFootnotes().isEmpty()) {
@@ -63,11 +62,8 @@ public class FootnoteCreator {
 
     private BigInteger addFootnoteObject(CTP text, BigInteger refId, String ftnText) {
         CTFtnEdn main = CTFtnEdn.Factory.newInstance();
-
-
         main.setId(refId);
         CTP ctp = main.addNewP();
-
         //ctp.addNewPPr().addNewPStyle().setVal("FootnoteText");
 
         CTR ctr = ctp.addNewR();
@@ -80,7 +76,6 @@ public class FootnoteCreator {
 
         ctText.setStringValue(ftnText);
 
-
         for (CTR textCTR : text.getRArray()) {
             for (CTText t : textCTR.getTArray()) {
                 t.setSpace(SpaceAttribute.Space.PRESERVE);
@@ -91,4 +86,5 @@ public class FootnoteCreator {
         XWPFFootnote footnote = doc.addFootnote(main);
         return refId;
     }
+
 }

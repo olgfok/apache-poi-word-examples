@@ -1,12 +1,13 @@
 package com.olgfok.word.helpers;
 
-import com.olgfok.word.dto.Footnote;
-import com.olgfok.word.dto.ListItem;
+import com.olgfok.word.creators.TableCreator;
+import com.olgfok.word.elements.Footnote;
+import com.olgfok.word.elements.ListItem;
 import com.olgfok.word.creators.FootnoteCreator;
 import com.olgfok.word.creators.ListCreator;
+import com.olgfok.word.elements.Table;
 import org.apache.poi.xwpf.usermodel.*;
-import org.apache.xmlbeans.impl.xb.xmlschema.SpaceAttribute;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -14,17 +15,18 @@ import java.util.List;
 
 public class CreateWordDocumentHelper {
 
-    private final XWPFDocument doc;
+    @Autowired
+    private XWPFDocument doc;
 
-    //todo dependency injection
-    private final FootnoteCreator footnoteCreator;
-    private final ListCreator listCreator;
+    @Autowired
+    private FootnoteCreator footnoteCreator;
 
-    public CreateWordDocumentHelper() {
-        this.doc = new XWPFDocument();
-        footnoteCreator = new FootnoteCreator(doc);
-        listCreator = new ListCreator();
-    }
+    @Autowired
+    private ListCreator listCreator;
+
+    @Autowired
+    private TableCreator tableCreator;
+
 
     public void write(String fileName) throws IOException {
 
@@ -40,12 +42,17 @@ public class CreateWordDocumentHelper {
     }
 
     public void addNumberedList(List<ListItem> list) {
-        final BigInteger numId = listCreator.createNumbering(doc, 3);
+        final BigInteger numId = listCreator.createNumbering(3);
 
         list.forEach(item -> {
-            listCreator.addParagraph(numId, doc, item.getLevel(), item.getText());
+            listCreator.addParagraph(numId, item.getLevel(), item.getText());
         });
 
+    }
+
+    public void addTables(List<Table> tables) {
+        tables.forEach(t ->
+                tableCreator.addTable(t.getHeaders(), t.getRowCount(), t.getColCount()));
     }
 
 

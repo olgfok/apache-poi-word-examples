@@ -1,16 +1,27 @@
 package com.olgfok.word.services;
 
-import com.olgfok.word.dto.DocumentContent;
-import com.olgfok.word.dto.Footnote;
-import com.olgfok.word.dto.ListItem;
+import com.olgfok.spring.config.AppConfig;
+import com.olgfok.word.elements.DocumentContent;
+import com.olgfok.word.elements.Footnote;
+import com.olgfok.word.elements.ListItem;
+import com.olgfok.word.elements.Table;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes={AppConfig.class})
 public class CreateDocumentTest {
 
+    @Autowired
+    private CreateWordDocumentService wordDocumentService;
     @Test
     public void createWordDocumentWithNestedList() throws IOException {
         DocumentContent content = new DocumentContent();
@@ -26,7 +37,7 @@ public class CreateDocumentTest {
         list.add(new ListItem(1, "Item 2.2"));
 
         content.setList(list);
-        new CreateWordDocumentImpl().createDocument("WordDocumentWithNestedList.docx", content);
+        wordDocumentService.createDocument("WordDocumentWithNestedList.docx", content);
     }
 
     @Test
@@ -37,6 +48,26 @@ public class CreateDocumentTest {
         footnotes.add(new Footnote("Another text with footnote", "The second footnote"));
         DocumentContent content = new DocumentContent();
         content.setFootnotes(footnotes);
-        new CreateWordDocumentImpl().createDocument("WordDocumentWithFootnotes.docx", content);
+        wordDocumentService.createDocument("WordDocumentWithFootnotes.docx", content);
+    }
+
+    @Test
+    public void createWordDocumentWithTable() throws IOException {
+        DocumentContent content = new DocumentContent();
+
+        List<String> headers = Arrays.asList("First column","Second column",
+                "Third column","Fourth column");
+
+        List<Table> tables =new ArrayList<>();
+        Table table = new Table();
+        table.setColCount(3);
+        table.setRowCount(4);
+        table.setHeaders(headers);
+
+        tables.add(table);
+        content.setTables(tables);
+
+
+        wordDocumentService.createDocument("WordDocumentWithTable.docx", content);
     }
 }

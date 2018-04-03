@@ -5,6 +5,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFNumbering;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 
@@ -13,10 +14,10 @@ import java.math.BigInteger;
  */
 public class ListCreator {
 
-    public BigInteger createNumbering(XWPFDocument document,
-                                              Integer levelCount) {
-        XWPFNumbering numbering = document.createNumbering();
-
+    @Autowired
+    private XWPFDocument doc;
+    public BigInteger createNumbering(Integer levelCount) {
+        XWPFNumbering numbering = doc.createNumbering();
 
         CTAbstractNum ctAbstractNum = CTAbstractNum.Factory.newInstance();
         ctAbstractNum.setAbstractNumId(BigInteger.ZERO);
@@ -51,9 +52,9 @@ public class ListCreator {
         return sb.toString();
     }
 
-    public void addParagraph(BigInteger numId, XWPFDocument document, Integer level,
+    public void addParagraph(BigInteger numId, Integer level,
                                      String rowName) {
-        XWPFParagraph p = document.createParagraph();
+        XWPFParagraph p = doc.createParagraph();
         p.setNumID(numId);
         //sets level to paragraph
         CTDecimalNumber ctDecimalNumber = p.getCTP().getPPr().getNumPr().addNewIlvl();

@@ -1,4 +1,4 @@
-package com.olgfok.word.dto;
+package com.olgfok.word.elements;
 
 public class Footnote {
     private String paragraphText;
